@@ -1,0 +1,8 @@
+{
+  "name": "Sentinel AI - Invisible Guardian",
+  "description": "An AI-powered security prototype that uses face matching to detect unauthorized users, silently records their activity, and provides an intelligent security assistant for logs and analysis.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
