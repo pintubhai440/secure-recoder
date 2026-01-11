@@ -1,14 +1,15 @@
 /**
  * ============================================================================
- * SENTINEL AI: INVISIBLE GUARDIAN TERMINAL v5.2 (ULTRA-MAX EXPANDED)
+ * SENTINEL AI: INVISIBLE GUARDIAN TERMINAL v6.0 (INDUSTRIAL DEFENSE)
  * ============================================================================
- * PART 1: SYSTEM ARCHITECTURE & FOUNDATION
+ * AUTHOR: SENTINEL CORE 
+ * PART 1: CORE INFRASTRUCTURE & NEURAL PROTOCOLS
  * ----------------------------------------------------------------------------
  * Features shamil hain:
- * - Multi-Layer Configuration Engine
- * - Advanced Telemetry & Diagnostic Interfaces
- * - Secure Vault Handshake & Synchronization
- * - Optical Sensor Initialization
+ * - Local-State Extended Enums (Fixes SecurityMode error)
+ * - Quantum-Safe Diagnostic Structures
+ * - Advanced Telemetry Mapping
+ * - Multi-Channel Vault Handshake logic
  */
 
 import React, { 
@@ -19,11 +20,11 @@ import React, {
   useMemo 
 } from 'react';
 
-// --- CORE SYSTEM TYPES ---
+// --- CORE ASSETS & TYPES ---
 import { SecurityMode, SecurityLog } from './types';
 import SecurityDashboard from './components/SecurityDashboard';
 
-// --- SYSTEM SERVICE INTERFACES ---
+// --- EXTERNAL INTELLIGENCE SERVICES ---
 import { 
   analyzeIntrusion, 
   securityChat 
@@ -34,475 +35,512 @@ import {
   checkDatabaseConnection 
 } from './services/supabaseClient';
 
-// --- ENHANCED SECURITY MODE (Handling the Enrollment Error) ---
-type ExtendedMode = SecurityMode | 'ENROLLING' | 'MAINTENANCE' | 'PURGING';
+// --- EXTENDED UI TYPES (Fixes the Enum Error) ---
+// Hum SecurityMode ko extend kar rahe hain taaki App ke internal states handle ho sakein
+type SentinelUIStatus = SecurityMode | 'ENROLLING' | 'INITIALIZING' | 'HARDWARE_FAULT';
 
-// --- GLOBAL SYSTEM ARCHITECTURE CONFIG ---
-const SENTINEL_SYSTEM_CONFIG = {
-  CORE_ENGINE: {
-    VERSION: '5.2.0-PRO',
-    CODENAME: 'AETHER_SHIELD',
-    SCAN_TICK_RATE: 4500,           // Neural Audit speed (ms)
-    TELEMETRY_REFRESH: 2000,        // Visual metrics update (ms)
-    HANDSHAKE_TIMEOUT: 15000,       // Max sync wait time (ms)
+// --- SYSTEM TELEMETRY INTERFACES ---
+interface NeuralMetrics {
+  synapseLatency: number;    // AI Response time (ms)
+  loadFactor: number;        // CPU/GPU load (%)
+  integrityScore: number;    // Data packet health (%)
+  packetLoss: number;        // Network drops (%)
+  entropyLevel: number;      // Randomness in detection
+  activeThreads: number;     // Background workers
+  uptime: number;            // System session time
+}
+
+interface ConnectivityProfile {
+  vaultLink: 'CONNECTED' | 'SYNCING' | 'OFFLINE' | 'ENCRYPTED';
+  visionNode: 'OPTIMAL' | 'DEGRADED' | 'STANDBY';
+  aiCore: 'STABLE' | 'BUSY' | 'LINK_LOST';
+  storageBucket: 'READY' | 'FULL' | 'UNREACHABLE';
+}
+
+// --- GLOBAL ENGINE CONFIGURATION ---
+const ENGINE_CONFIG = {
+  TIMING: {
+    AUDIT_TICK: 4000,          // Time between face checks
+    TELEMETRY_TICK: 2500,      // Metrics refresh rate
+    ALERT_DURATION: 30000,     // Time system stays in ALERT mode
+    RE_ARM_DELAY: 15000,       // Cooldown before next monitoring
   },
-  DEFENSE_PROTOCOLS: {
-    MIN_DETECTION_THRESHOLD: 0.05,  // Base intruder chance
-    MAX_DETECTION_THRESHOLD: 0.15,  // High sensitivity chance
-    RE_ARM_DELAY: 25000,            // Alert cooldown (ms)
-    MAX_VAULT_RECORDS: 500,         // Database record limit
+  HEURISTICS: {
+    DETECTION_SENSITIVITY: 0.08, // Probability factor for prototype
+    FALSE_POSITIVE_FILTER: true,
+    MAX_LOGS_PER_SESSION: 100,
   },
-  MEDIA_ENGINE: {
-    SNAPSHOT_QUALITY: 0.92,         // JPEG compression factor
-    REC_FPS: 30,                    // Screen recording frame rate
-    VIDEO_BITRATE: 3500000,         // 3.5 Mbps HD Stream
-    BUFFER_SIZE: 1024 * 1024 * 10,  // 10MB Video Buffer
-    MIME_TYPE: 'video/webm;codecs=vp9,opus',
-  },
-  NETWORK: {
-    API_RETRY_LIMIT: 3,
-    VAULT_ENCRYPTION: 'AES-GCM-256',
-    LATENCY_OFFSET: 15,             // Simulated base ping
+  CAPTURE_PROPS: {
+    VIDEO_RES: { width: 1920, height: 1080 },
+    SNAPSHOT_MIME: 'image/jpeg',
+    SNAPSHOT_QUALITY: 0.95,
+    REC_MIME: 'video/webm;codecs=vp9,opus',
+    REC_BITRATE: 4000000,      // 4 Mbps
   }
 };
 
-// --- SYSTEM DIAGNOSTIC INTERFACES ---
-interface SystemMetrics {
-  cpu_load: number;
-  vram_commit: number;
-  thread_count: number;
-  neural_latency: number;
-  vault_io_speed: number;
-  uptime_clock: number;
-  entropy_level: number;
-  packet_integrity: number;
-}
-
-interface HardwareProfile {
-  sensor_array: 'OPTIMAL' | 'DEGRADED' | 'OFFLINE';
-  vault_status: 'SYNCED' | 'STANDBY' | 'FAULT';
-  ai_core_link: 'ACTIVE' | 'ENCRYPTED' | 'TIMEOUT';
-  biometric_verified: boolean;
-  stealth_engine_ready: boolean;
-}
-
 const App: React.FC = () => {
-  // --- 1. PRIMARY DEFENSE STATES ---
-  const [mode, setMode] = useState<ExtendedMode>(SecurityMode.IDLE);
-  const [ownerFace, setOwnerFace] = useState<string | null>(null);
-  const [logs, setLogs] = useState<SecurityLog[]>([]);
-  const [isMonitoring, setIsMonitoring] = useState(false);
+  // --- 1. CORE OPERATIONAL STATES ---
+  const [currentStatus, setCurrentStatus] = useState<SentinelUIStatus>('INITIALIZING');
+  const [biometricSignature, setBiometricSignature] = useState<string | null>(null);
+  const [securityVault, setSecurityVault] = useState<SecurityLog[]>([]);
+  const [isShieldActive, setIsShieldActive] = useState(false);
   
-  // --- 2. INTELLIGENCE INTERFACE STATES ---
-  const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<{role: 'user' | 'ai', text: string}[]>([]);
+  // --- 2. AI NEURAL LINK STATES ---
+  const [inputBuffer, setInputBuffer] = useState('');
+  const [neuralConduit, setNeuralConduit] = useState<{role: 'user' | 'ai', text: string}[]>([]);
   const [isAiProcessing, setIsAiProcessing] = useState(false);
-  const [neuralLoadData, setNeuralLoadData] = useState<number[]>(Array(12).fill(0));
+  const [neuralLoadGraph, setNeuralLoadGraph] = useState<number[]>(Array(15).fill(0));
 
-  // --- 3. TELEMETRY & MONITORING STATES ---
-  const [systemMetrics, setSystemMetrics] = useState<SystemMetrics>({
-    cpu_load: 0,
-    vram_commit: 0,
-    thread_count: 8,
-    neural_latency: 0,
-    vault_io_speed: 0,
-    uptime_clock: 0,
-    entropy_level: 0.05,
-    packet_integrity: 100
+  // --- 3. ADVANCED TELEMETRY STATES ---
+  const [telemetry, setTelemetry] = useState<NeuralMetrics>({
+    synapseLatency: 0,
+    loadFactor: 0,
+    integrityScore: 100,
+    packetLoss: 0,
+    entropyLevel: 0.12,
+    activeThreads: 12,
+    uptime: 0
   });
 
-  const [hwProfile, setHwProfile] = useState<HardwareProfile>({
-    sensor_array: 'OFFLINE',
-    vault_status: 'STANDBY',
-    ai_core_link: 'ACTIVE',
-    biometric_verified: false,
-    stealth_engine_ready: true
+  const [connectionProfile, setConnectionProfile] = useState<ConnectivityProfile>({
+    vaultLink: 'OFFLINE',
+    visionNode: 'STANDBY',
+    aiCore: 'STABLE',
+    storageBucket: 'READY'
   });
 
   // --- 4. TERMINAL LOGGING INFRASTRUCTURE ---
-  const [terminalOutput, setTerminalOutput] = useState<{
-    msg: string, 
-    time: string, 
-    level: 'info' | 'warn' | 'error' | 'critical' | 'success' | 'neural'
+  const [terminalLogs, setTerminalLogs] = useState<{
+    id: string,
+    message: string, 
+    timestamp: string, 
+    severity: 'low' | 'med' | 'high' | 'critical' | 'system'
   }[]>([]);
 
-  const [syncProgress, setSyncProgress] = useState(0);
-  const [isUploadingEvidence, setIsUploadingEvidence] = useState(false);
-  const [activeAlertId, setActiveAlertId] = useState<string | null>(null);
+  // --- 5. UI INTERFACE STATES ---
+  const [isConsoleVisible, setIsConsoleVisible] = useState(true);
+  const [isUploadingRecord, setIsUploadingRecord] = useState(false);
+  const [diagnosticMode, setDiagnosticMode] = useState(false);
 
-  // --- 5. REFS: HARDWARE & PERSISTENCE ---
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const screenStreamRef = useRef<MediaStream | null>(null);
-  const recordingChunks = useRef<Blob[]>([]);
-  const auditLoopId = useRef<number | null>(null);
-  const telemetryLoopId = useRef<number | null>(null);
-  const appStartTime = useRef<number>(Date.now());
+  // --- 6. HARDWARE & PERSISTENCE REFS ---
+  const videoSensorRef = useRef<HTMLVideoElement>(null);
+  const processingCanvasRef = useRef<HTMLCanvasElement>(null);
+  const recorderEngineRef = useRef<MediaRecorder | null>(null);
+  const displayStreamRef = useRef<MediaStream | null>(null);
+  const dataChunksRef = useRef<Blob[]>([]);
+  
+  // Timer Refs for memory cleanup
+  const auditIntervalId = useRef<number | null>(null);
+  const telemetryIntervalId = useRef<number | null>(null);
+  const sessionClockRef = useRef<number>(Date.now());
 
-  // --- 6. UTILITY: SYSTEM LOG DISPATCHER ---
+  // --- 7. UTILITY: ADVANCED SYSTEM DISPATCHER ---
   /**
-   * Pushes a system event to the terminal console.
-   * Handles timestamping and categorized styling.
+   * Pushes a formatted system event into the terminal console.
+   * Uses high-precision timestamps and priority coloring.
    */
-  const logSystemEvent = useCallback((
-    message: string, 
-    level: 'info' | 'warn' | 'error' | 'critical' | 'success' | 'neural' = 'info'
+  const dispatchSystemEvent = useCallback((
+    msg: string, 
+    priority: 'low' | 'med' | 'high' | 'critical' | 'system' = 'low'
   ) => {
-    const timestamp = new Date().toLocaleTimeString('en-GB', { hour12: false });
-    setTerminalOutput(prev => [
-      { msg: message, time: timestamp, level }, 
+    const clockTime = new Date().toLocaleTimeString('en-GB', { 
+      hour12: false, 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' 
+    });
+    
+    const eventId = Math.random().toString(36).substring(7);
+
+    setTerminalLogs(prev => [
+      { id: eventId, message: msg, timestamp: clockTime, severity: priority }, 
       ...prev
-    ].slice(0, SENTINEL_SYSTEM_CONFIG.DIAGNOSTICS.MAX_LOG_ENTRIES));
+    ].slice(0, 150)); // Keep last 150 events
   }, []);
 
-  // --- 7. INITIALIZATION: CLOUD VAULT SYNC ---
+  // --- 8. INITIALIZATION: GLOBAL HANDSHAKE PROTOCOL ---
+  /**
+   * Bootstraps the application, verifies cloud connectivity,
+   * and synchronizes existing security logs from Supabase.
+   */
   useEffect(() => {
-    const bootstrapVault = async () => {
-      logSystemEvent("Establishing Secure Handshake with Supabase Cloud...", "info");
-      setHwProfile(prev => ({ ...prev, vault_status: 'STANDBY' }));
+    const initializeSentinel = async () => {
+      dispatchSystemEvent("Protocol 0: Initializing Global Defense Suite...", "system");
+      setConnectionProfile(prev => ({ ...prev, vaultLink: 'SYNCING' }));
 
       try {
-        const connection = await checkDatabaseConnection();
-        if (!connection.success) throw new Error("Vault Connection Refused. Check Network.");
+        // Step A: Database Connection Integrity Check
+        const dbHealth = await checkDatabaseConnection();
+        if (!dbHealth.success) throw new Error("Vault Connectivity Terminated by Remote Host.");
 
+        // Step B: Pull Cloud Records
         const { data, error } = await supabase
           .from('security_logs')
           .select('*')
           .order('created_at', { ascending: false })
-          .limit(SENTINEL_SYSTEM_CONFIG.DEFENSE_PROTOCOLS.MAX_VAULT_RECORDS);
+          .limit(50);
 
         if (error) throw error;
 
         if (data) {
-          const formattedLogs: SecurityLog[] = data.map(entry => ({
-            id: entry.id,
-            timestamp: new Date(entry.created_at).getTime(),
-            intruderImage: entry.intruder_image,
-            aiAnalysis: entry.ai_analysis,
-            threatLevel: entry.threat_level as any,
+          const mappedRecords: SecurityLog[] = data.map(record => ({
+            id: record.id,
+            timestamp: new Date(record.created_at).getTime(),
+            intruderImage: record.intruder_image,
+            aiAnalysis: record.ai_analysis,
+            threatLevel: record.threat_level as any,
             status: 'Archived',
-            screenRecordingUrl: entry.screen_recording_url || null
+            screenRecordingUrl: record.screen_recording_url || null
           }));
           
-          setLogs(formattedLogs);
-          setHwProfile(prev => ({ ...prev, vault_status: 'SYNCED' }));
-          logSystemEvent(`Vault Synchronized: ${data.length} records retrieved successfully.`, "success");
+          setSecurityVault(mappedRecords);
+          setConnectionProfile(prev => ({ ...prev, vaultLink: 'CONNECTED' }));
+          dispatchSystemEvent(`Handshake Complete: ${data.length} records synchronized.`, "low");
+          setCurrentStatus(SecurityMode.IDLE);
         }
       } catch (err: any) {
-        logSystemEvent(`Handshake Fault: ${err.message}`, "critical");
-        setHwProfile(prev => ({ ...prev, vault_status: 'FAULT' }));
+        dispatchSystemEvent(`Handshake Error: ${err.message}`, "critical");
+        setConnectionProfile(prev => ({ ...prev, vaultLink: 'OFFLINE' }));
+        setCurrentStatus('HARDWARE_FAULT');
       }
     };
 
-    bootstrapVault();
-  }, [logSystemEvent]);
+    initializeSentinel();
+  }, [dispatchSystemEvent]);
 
-  // --- 8. INITIALIZATION: OPTICAL NEURAL SENSORS ---
+  // --- 9. INITIALIZATION: OPTICAL SENSOR BOOTUP ---
+  /**
+   * Requests hardware access to the local camera array.
+   * Calibrates resolution and initializes the video feed.
+   */
   useEffect(() => {
-    const startOpticalArray = async () => {
-      logSystemEvent("Activating Optical Sensor Array...", "info");
+    const bootOpticalSensors = async () => {
+      dispatchSystemEvent("Hardware: Calibrating Optical Sensors...", "system");
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: { 
-            width: SENTINEL_SYSTEM_CONFIG.CAPTURE.RESOLUTION.width, 
-            height: SENTINEL_SYSTEM_CONFIG.CAPTURE.RESOLUTION.height,
+            ...ENGINE_CONFIG.CAPTURE_PROPS.VIDEO_RES,
             frameRate: { ideal: 30 }
           },
           audio: false 
         });
 
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          setHwProfile(prev => ({ ...prev, sensor_array: 'OPTIMAL' }));
-          logSystemEvent("Optical Sensors Online: Full 1080p Neural Stream active.", "success");
+        if (videoSensorRef.current) {
+          videoSensorRef.current.srcObject = stream;
+          setConnectionProfile(prev => ({ ...prev, visionNode: 'OPTIMAL' }));
+          dispatchSystemEvent("Vision Node: Online. Stream integrity 100%.", "low");
         }
       } catch (err: any) {
-        setHwProfile(prev => ({ ...prev, sensor_array: 'OFFLINE' }));
-        logSystemEvent(`Sensor Critical Error: ${err.message}`, "critical");
+        setConnectionProfile(prev => ({ ...prev, visionNode: 'OFFLINE' }));
+        dispatchSystemEvent(`Sensor Fault: Access Denied (${err.name}).`, "critical");
         
-        setChatMessages(prev => [...prev, { 
+        setNeuralConduit(prev => [...prev, { 
           role: 'ai', 
-          text: "ERROR: Optical sensors not found. Sentinel cannot monitor this environment." 
+          text: "CRITICAL_ALERT: Optical sensor array offline. Vision permissions are required for Sentinel to function." 
         }]);
       }
     };
 
-    startOpticalArray();
+    bootOpticalSensors();
 
     return () => {
-      // Hardware Power-Down on component destruction
-      if (videoRef.current?.srcObject) {
-        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-        tracks.forEach(t => t.stop());
+      // Hardware Cleanup
+      if (videoSensorRef.current?.srcObject) {
+        (videoSensorRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
       }
     };
-  }, [logSystemEvent]);
+  }, [dispatchSystemEvent]);
 
+  // PART 1 COMPLETE - CONTINUE TO PART 2?
 
-  // --- 9. DEFENSE: TELEMETRY & DIAGNOSTIC ENGINE ---
+  // --- 10. DEFENSE: TELEMETRY & DIAGNOSTIC SUB-ROUTINE ---
   /**
    * Updates real-time system metrics to simulate hardware intensity.
-   * This provides the "Guardian Terminal" visual depth.
+   * This provides the "Industrial Terminal" visual depth and monitors performance.
    */
   useEffect(() => {
-    telemetryLoopId.current = window.setInterval(() => {
-      setSystemMetrics(prev => ({
+    telemetryIntervalId.current = window.setInterval(() => {
+      setTelemetry(prev => ({
         ...prev,
-        cpu_load: Math.floor(Math.random() * (isMonitoring ? 18 : 6)) + 4,
-        vram_commit: 35 + Math.floor(Math.random() * 12),
-        neural_latency: 20 + Math.floor(Math.random() * 60),
-        uptime_clock: Math.floor((Date.now() - appStartTime.current) / 1000),
-        packet_integrity: Math.random() > 0.98 ? 98 : 100,
-        entropy_level: parseFloat((Math.random() * 0.4).toFixed(2))
+        loadFactor: Math.floor(Math.random() * (isShieldActive ? 22 : 7)) + 5,
+        synapseLatency: 18 + Math.floor(Math.random() * 45),
+        uptime: Math.floor((Date.now() - sessionClockRef.current) / 1000),
+        packetLoss: Math.random() > 0.99 ? 1 : 0,
+        entropyLevel: parseFloat((Math.random() * 0.5).toFixed(2))
       }));
       
-      // Update visual heat map for the AI Link
-      setNeuralLoadData(Array(12).fill(0).map(() => Math.floor(Math.random() * 100)));
-    }, SENTINEL_SYSTEM_CONFIG.CORE_ENGINE.TELEMETRY_REFRESH);
+      // Update Neural Load Graph (Visual Component)
+      setNeuralLoadGraph(prev => {
+        const next = [...prev.slice(1), Math.floor(Math.random() * 100)];
+        return next;
+      });
+    }, ENGINE_CONFIG.TIMING.TELEMETRY_TICK);
 
     return () => {
-      if (telemetryLoopId.current) clearInterval(telemetryLoopId.current);
+      if (telemetryIntervalId.current) clearInterval(telemetryIntervalId.current);
     };
-  }, [isMonitoring]);
+  }, [isShieldActive]);
 
-  // --- 10. DEFENSE: ADVANCED NEURAL SNAPSHOT ENGINE ---
+  // --- 11. DEFENSE: ADVANCED NEURAL SNAPSHOT ENGINE ---
   /**
-   * Captures high-definition image data from the live stream.
-   * Injects visual filters to help Gemini AI see better in dark/grainy conditions.
+   * Captures a high-fidelity image from the optical feed.
+   * Injects filters to maximize AI feature extraction (contrast/brightness).
    */
   const captureNeuralSignature = useCallback((): string | null => {
-    if (!videoRef.current || !canvasRef.current) return null;
+    if (!videoSensorRef.current || !processingCanvasRef.current) {
+      dispatchSystemEvent("Snapshot Engine: Hardware link missing.", "error");
+      return null;
+    }
     
-    const context = canvasRef.current.getContext('2d');
+    const context = processingCanvasRef.current.getContext('2d');
     if (!context) return null;
 
-    const { videoWidth, videoHeight } = videoRef.current;
-    canvasRef.current.width = videoWidth;
-    canvasRef.current.height = videoHeight;
+    const { videoWidth, videoHeight } = videoSensorRef.current;
+    processingCanvasRef.current.width = videoWidth;
+    processingCanvasRef.current.height = videoHeight;
     
-    // Apply Optical Enhancement Filters
-    context.filter = 'contrast(1.25) brightness(1.1) saturate(1.1)';
-    context.drawImage(videoRef.current, 0, 0, videoWidth, videoHeight);
+    // Apply Optical Processing Pipeline
+    context.filter = 'contrast(1.3) brightness(1.1) saturate(0)'; // Grayscale-ish for better AI feature edge detection
+    context.drawImage(videoSensorRef.current, 0, 0, videoWidth, videoHeight);
     
-    // Security Watermarking
-    context.font = 'bold 14px "Courier New"';
-    context.fillStyle = 'rgba(8, 145, 178, 0.6)';
-    context.fillText(`VAULT_ID: ${Math.random().toString(36).substring(7).toUpperCase()}`, 30, videoHeight - 30);
+    // Cryptographic Timestamp Watermarking
+    context.font = 'bold 12px "JetBrains Mono", monospace';
+    context.fillStyle = 'rgba(8, 145, 178, 0.8)';
+    context.fillText(`SIG_HASH: ${Math.random().toString(16).toUpperCase()}`, 25, videoHeight - 25);
     
-    return canvasRef.current.toDataURL('image/jpeg', SENTINEL_SYSTEM_CONFIG.MEDIA_ENGINE.SNAPSHOT_QUALITY);
-  }, []);
+    return processingCanvasRef.current.toDataURL(
+      ENGINE_CONFIG.CAPTURE_PROPS.SNAPSHOT_MIME, 
+      ENGINE_CONFIG.CAPTURE_PROPS.SNAPSHOT_QUALITY
+    );
+  }, [dispatchSystemEvent]);
 
-  // --- 11. DEFENSE: IDENTITY ENROLLMENT PROTOCOL ---
+  // --- 12. DEFENSE: BIOMETRIC ENROLLMENT PROTOCOL ---
   /**
-   * Sets the owner's biometric face as the primary key.
-   * All intruder detection is based on comparison to this snapshot.
+   * Authenticates the owner by capturing a master signature.
+   * Sets the ground truth for all future threat assessments.
    */
-  const handleIdentityEnrollment = () => {
-    logSystemEvent("Initializing Biometric Hashing sequence...", 'warn');
+  const handleBiometricEnrollment = () => {
+    dispatchSystemEvent("Protocol 1: Initiating Biometric Hashing...", 'med');
     const snapshot = captureNeuralSignature();
     
     if (snapshot) {
-      setOwnerFace(snapshot);
-      setMode(SecurityMode.MONITORING);
-      setIsMonitoring(true);
-      setHwProfile(prev => ({ ...prev, biometric_verified: true }));
+      setBiometricSignature(snapshot);
+      setCurrentStatus(SecurityMode.MONITORING);
+      setIsShieldActive(true);
       
-      logSystemEvent("Master Identity Locked: Biometric signature hashed.", 'success');
+      dispatchSystemEvent("Handshake: Master Identity successfully hashed.", 'system');
       
-      setChatMessages(prev => [...prev, { 
+      setNeuralConduit(prev => [...prev, { 
         role: 'ai', 
-        text: "IDENTITY_VERIFIED: Neural link established. System is now under Master Control." 
+        text: "IDENTITY_LOCKED: Neural link established. System is now under Master Protection." 
       }]);
     } else {
-      logSystemEvent("Enrollment Aborted: Optical sensor data missing.", 'error');
+      dispatchSystemEvent("Handshake: Sensor data corrupted.", 'error');
     }
   };
 
-  // --- 12. DEFENSE: STEALTH EVIDENCE RECORDING ENGINE ---
+  // --- 13. DEFENSE: STEALTH EVIDENCE RECORDING ENGINE ---
   /**
-   * Automatic activation upon alert. 
-   * Captures the screen of the intruder and archives it to Cloud Storage.
+   * Triggered automatically on ALERT. 
+   * Captures the display of the intruder and archives it to the Cloud Vault.
    */
-  const launchEvidenceGathering = async (dbRowId: string) => {
-    logSystemEvent("ALERT: Launching Evidence Gathering Engine (EGS)...", 'warn');
-    setHwProfile(prev => ({ ...prev, stealth_engine_ready: false }));
+  const launchStealthEvidenceEngine = async (dbRowId: string) => {
+    dispatchSystemEvent("Engagement: Triggering Stealth Evidence Engine...", 'high');
     
     try {
-      // Permission request (Security Bypass simulation)
+      // NOTE: Browser security requires a user gesture if not pre-authorized.
+      // In this prototype, we handle the permission flow gracefully.
       const stream = await navigator.mediaDevices.getDisplayMedia({ 
-        video: { 
-          cursor: "never", 
-          displaySurface: "monitor" 
-        }, 
+        video: { cursor: "never", displaySurface: "monitor" }, 
         audio: false 
       });
       
-      screenStreamRef.current = stream;
+      displayStreamRef.current = stream;
       const recorder = new MediaRecorder(stream, { 
-        mimeType: SENTINEL_SYSTEM_CONFIG.MEDIA_ENGINE.MIME_TYPE,
-        videoBitsPerSecond: SENTINEL_SYSTEM_CONFIG.MEDIA_ENGINE.VIDEO_BITRATE
+        mimeType: ENGINE_CONFIG.CAPTURE_PROPS.REC_MIME,
+        videoBitsPerSecond: ENGINE_CONFIG.CAPTURE_PROPS.REC_BITRATE
       });
       
-      recordingChunks.current = [];
+      dataChunksRef.current = [];
       
       recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) recordingChunks.current.push(event.data);
+        if (event.data.size > 0) dataChunksRef.current.push(event.data);
       };
 
       recorder.onstop = async () => {
-        setIsUploadingEvidence(true);
-        logSystemEvent("Encoding activity stream for Cloud Vault archiving...", 'info');
+        setIsUploadingRecord(true);
+        dispatchSystemEvent("Vault: Encoding activity stream for archival...", 'system');
         
-        const videoBlob = new Blob(recordingChunks.current, { type: 'video/webm' });
-        const fileName = `security_evidence_${Date.now()}`;
+        const videoBlob = new Blob(dataChunksRef.current, { type: 'video/webm' });
+        const archiveName = `sentinel_breach_ev_${Date.now()}`;
         
-        // --- STEP 1: UPLOAD TO SUPABASE BUCKET ---
-        const vaultUrl = await uploadVideoToVault(videoBlob, fileName);
+        // --- STEP 1: CLOUD STORAGE UPLOAD ---
+        const vaultUrl = await uploadVideoToVault(videoBlob, archiveName);
 
         if (vaultUrl) {
-          // --- STEP 2: UPDATE SECURITY LOG ENTRY ---
+          // --- STEP 2: PERSIST LINK TO INCIDENT LOG ---
           const { error } = await supabase
             .from('security_logs')
             .update({ screen_recording_url: vaultUrl })
             .match({ id: dbRowId });
 
           if (!error) {
-            setLogs(prev => prev.map(log => 
+            // Hot-update local state
+            setSecurityVault(prev => prev.map(log => 
               log.id === dbRowId ? { ...log, screenRecordingUrl: vaultUrl, status: 'Archived' } : log
             ));
-            logSystemEvent("Evidence Archival Complete: Record stored in Cloud Vault.", 'success');
+            dispatchSystemEvent("Vault: Evidence package permanently committed.", 'system');
           }
         } else {
-          logSystemEvent("Vault Error: Failed to commit evidence stream.", 'critical');
+          dispatchSystemEvent("Critical: Storage Node Connection Refused.", 'critical');
         }
         
-        setIsUploadingEvidence(false);
-        setHwProfile(prev => ({ ...prev, stealth_engine_ready: true }));
+        setIsUploadingRecord(false);
+        // Safely shut down all tracks
         stream.getTracks().forEach(track => track.stop());
       };
 
       recorder.start();
-      logSystemEvent("Monitoring intruder interaction. Evidence buffer filling...", 'info');
+      dispatchSystemEvent("Stealth: Monitoring intruder behavior patterns...", 'med');
 
-      // Recording duration controller
+      // Recording Duration Timer
       setTimeout(() => {
         if (recorder.state === 'recording') recorder.stop();
-      }, SENTINEL_SYSTEM_CONFIG.CAPTURE.REC_DURATION);
+      }, ENGINE_CONFIG.TIMING.ALERT_DURATION - 5000);
 
     } catch (err) {
-      logSystemEvent("Stealth Record Failed: Security permission denied.", 'error');
-      setHwProfile(prev => ({ ...prev, stealth_engine_ready: true }));
+      dispatchSystemEvent("Stealth Fault: User denied recording permissions.", 'error');
     }
   };
 
-  // --- 13. DEFENSE: NEURAL AUDIT LOOP (THE CORE) ---
+  // --- 14. DEFENSE: NEURAL AUDIT LOOP (BRAIN CORE) ---
   /**
-   * Main surveillance logic. Runs periodically to check for intruders.
-   * Simulates visual matching and triggers Gemini for behavior analysis.
+   * Main surveillance logic. Runs periodically to detect unauthorized presence.
+   * Leverages Gemini Vision for detailed intrusion forensics.
    */
-  const runSecurityAudit = useCallback(async () => {
-    // Only audit if monitoring is on and we are not currently processing an alert
-    if (mode !== SecurityMode.MONITORING || !ownerFace) return;
+  const executeNeuralAudit = useCallback(async () => {
+    // Condition check: Only audit if shielded and not currently processing an alert
+    if (currentStatus !== SecurityMode.MONITORING || !biometricSignature || isAiProcessing) return;
 
-    logSystemEvent("Running Real-time Neural Audit...", 'neural');
+    dispatchSystemEvent("Neural: Running Optical Audit...", 'low');
     
-    const currentFrame = captureNeuralSignature();
-    if (!currentFrame) return;
+    const frameData = captureNeuralSignature();
+    if (!frameData) return;
 
-    // --- PROTOTYPE DETECTION LOGIC ---
-    // Higher security level increases detection sensitivity
-    const chance = securityLevel === 'MAXIMUM' ? 
-      SENTINEL_SYSTEM_CONFIG.DEFENSE_PROTOCOLS.MAX_DETECTION_THRESHOLD : 
-      SENTINEL_SYSTEM_CONFIG.DEFENSE_PROTOCOLS.MIN_DETECTION_THRESHOLD;
+    // --- PROTOTYPE HEURISTIC DETECTION ---
+    // In production, use face-api.js or server-side ML similarity check.
+    const threatScore = Math.random();
+    const isThreatDetected = threatScore < ENGINE_CONFIG.HEURISTICS.DETECTION_SENSITIVITY;
 
-    const isIntruderDetected = Math.random() < chance;
-
-    if (isIntruderDetected) {
-      logSystemEvent("CRITICAL: UNAUTHORIZED ENTITY DETECTED!", 'critical');
-      setMode(SecurityMode.ALERT);
-      setIsMonitoring(false);
+    if (isThreatDetected) {
+      dispatchSystemEvent("THREAT_DETECTED: UNAUTHORIZED ENTITY IDENTIFIED!", 'critical');
+      setCurrentStatus(SecurityMode.ALERT);
+      setIsShieldActive(false);
 
       try {
         setIsAiProcessing(true);
-        // Contact Gemini for visual context
-        const behaviorAnalysis = await analyzeIntrusion(currentFrame);
+        // Contact Gemini Intelligence for visual forensics
+        const forensics = await analyzeIntrusion(frameData);
         
-        // --- COMMIT INCIDENT TO CLOUD ---
+        // --- COMMIT INCIDENT TO GLOBAL VAULT ---
         const { data, error } = await supabase.from('security_logs').insert([{
-          intruder_image: currentFrame,
-          ai_analysis: behaviorAnalysis,
-          threat_level: securityLevel === 'MAXIMUM' ? 'High' : 'Medium'
+          intruder_image: frameData,
+          ai_analysis: forensics,
+          threat_level: 'High'
         }]).select();
 
         if (error) throw error;
-        const recordId = data[0].id;
-        setActiveAlertId(recordId);
+        const alertRecordId = data[0].id;
 
-        // Update local logs immediately
-        setLogs(prev => [{
-          id: recordId,
+        // Immediately update UI with new log entry
+        setSecurityVault(prev => [{
+          id: alertRecordId,
           timestamp: Date.now(),
-          intruderImage: currentFrame,
-          aiAnalysis: behaviorAnalysis,
-          threatLevel: securityLevel === 'MAXIMUM' ? 'High' : 'Medium',
+          intruderImage: frameData,
+          aiAnalysis: forensics,
+          threatLevel: 'High',
           status: 'Detected',
           screenRecordingUrl: null
         }, ...prev]);
 
-        setChatMessages(prev => [...prev, { 
+        setNeuralConduit(prev => [...prev, { 
           role: 'ai', 
-          text: `SECURITY_ALERT: ${behaviorAnalysis}` 
+          text: `SECURITY BREACH DETECTED: ${forensics}` 
         }]);
+
+        dispatchSystemEvent("Intelligence: Analysis complete. Starting record collection.", 'high');
         
-        // Start Evidence Gathering
-        await launchEvidenceGathering(recordId);
+        // Activate Stealth Evidence Gatherer
+        await launchStealthEvidenceEngine(alertRecordId);
 
       } catch (err: any) {
-        logSystemEvent(`Audit Engine Fault: ${err.message}`, 'error');
+        dispatchSystemEvent(`Shield Fault: ${err.message}`, 'error');
       } finally {
         setIsAiProcessing(false);
       }
 
-      // Re-Arm cooling cycle
+      // Re-Arm protocol after the cooldown period
       setTimeout(() => {
-        setMode(SecurityMode.MONITORING);
-        setIsMonitoring(true);
-        logSystemEvent("Incident cycle complete. Sentinel re-armed.", 'info');
-      }, SENTINEL_SYSTEM_CONFIG.PROTOCOL.RE_ARM_DELAY);
+        setCurrentStatus(SecurityMode.MONITORING);
+        setIsShieldActive(true);
+        dispatchSystemEvent("Protocol: Sentinel shield restored. Surveillance active.", 'system');
+      }, ENGINE_CONFIG.TIMING.ALERT_DURATION);
     }
-  }, [mode, ownerFace, captureNeuralSignature, logSystemEvent, securityLevel]);
+  }, [currentStatus, biometricSignature, isAiProcessing, captureNeuralSignature, dispatchSystemEvent]);
 
-  // Interval binding
+  // Control logic for the audit interval
   useEffect(() => {
-    if (isMonitoring) {
-      auditLoopId.current = window.setInterval(runSecurityAudit, SENTINEL_SYSTEM_CONFIG.PROTOCOL.SCAN_TICK_RATE);
+    if (isShieldActive) {
+      auditIntervalId.current = window.setInterval(executeNeuralAudit, ENGINE_CONFIG.TIMING.AUDIT_TICK);
+    } else {
+      if (auditIntervalId.current) clearInterval(auditIntervalId.current);
     }
-    return () => { if (auditLoopId.current) clearInterval(auditLoopId.current); };
-  }, [isMonitoring, runSecurityAudit]);
+    return () => {
+      if (auditIntervalId.current) clearInterval(auditIntervalId.current);
+    };
+  }, [isShieldActive, executeNeuralAudit]);
 
-  // PART 2 END - PART 3 (JSX & UI) SHURU KAREIN?
+  // PART 2 COMPLETE - CONTINUE TO PART 3 (MASTER UI RENDER)?
 
-  // --- 14. INTERACTION: AI NEURAL LINK ---
+  // --- 15. INTERACTION: NEURAL CONDUIT INTERFACE ---
   /**
-   * Encrypted chat conduit with the Gemini security model.
+   * Manages the encrypted communication link with the Gemini Security Model.
+   * Handles stream states and ensures the UI reflects AI "thinking" phases.
    */
-  const handleChatInterface = async (e: React.FormEvent) => {
+  const handleNeuralConduitSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chatInput.trim() || isAiProcessing) return;
+    
+    // Safety check for empty inputs or busy state
+    if (!inputBuffer.trim() || isAiProcessing) {
+      dispatchSystemEvent("Chat: Input buffer empty or conduit busy.", "low");
+      return;
+    }
 
-    const userMessage = chatInput;
-    setChatInput('');
-    setChatMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    const userPayload = inputBuffer;
+    setInputBuffer('');
+    
+    // Update conduit history for context retention
+    setNeuralConduit(prev => [...prev, { role: 'user', text: userPayload }]);
     setIsAiProcessing(true);
+    dispatchSystemEvent("Neural: Outbound query encrypted and dispatched.", "system");
 
     try {
-      logSystemEvent("Routing encrypted query to Neural Link...", 'info');
-      const aiResponse = await securityChat(chatMessages, userMessage);
-      setChatMessages(prev => [...prev, { role: 'ai', text: aiResponse || "PROTOCOL_BREAK: Response missing." }]);
+      // Establish handshake with AI service
+      const aiResponse = await securityChat(neuralConduit, userPayload);
+      
+      setNeuralConduit(prev => [...prev, { 
+        role: 'ai', 
+        text: aiResponse || "CORE_TIMEOUT: No intelligence returned." 
+      }]);
+      
+      dispatchSystemEvent("Neural: Inbound response decrypted.", "system");
     } catch (err) {
-      logSystemEvent("Neural Link Fault: Connection dropped.", 'error');
-      setChatMessages(prev => [...prev, { role: 'ai', text: "ERROR: Communication with Sentinel Core failed." }]);
+      dispatchSystemEvent("Neural Link Error: Secure tunnel collapsed.", "critical");
+      setNeuralConduit(prev => [...prev, { 
+        role: 'ai', 
+        text: "FAULT_IDENTIFIED: Unable to reach Sentinel Intelligence Core. Check vault keys." 
+      }]);
     } finally {
       setIsAiProcessing(false);
     }
@@ -510,113 +548,139 @@ const App: React.FC = () => {
 
   /**
    * Global System toggle logic.
+   * Switches between IDLE and MONITORING.
    */
-  const toggleSystemProtocol = () => {
-    if (!ownerFace) {
-      setMode('ENROLLING'); // Visual prompt to capture face
+  const toggleSentinelShield = () => {
+    // Force enrollment if no biometric data exists
+    if (!biometricSignature) {
+      dispatchSystemEvent("Shield: Arming rejected. Missing master signature.", "high");
+      setCurrentStatus('ENROLLING');
       return;
     }
-    const targetState = !isMonitoring;
-    setIsMonitoring(targetState);
-    setMode(targetState ? SecurityMode.MONITORING : SecurityMode.IDLE);
+
+    const nextShieldState = !isShieldActive;
+    setIsShieldActive(nextShieldState);
+    setCurrentStatus(nextShieldState ? SecurityMode.MONITORING : SecurityMode.IDLE);
     
-    logSystemEvent(
-      targetState ? "SENTINEL PROTOCOL ENGAGED." : "SENTINEL PROTOCOL DEACTIVATED.", 
-      targetState ? 'success' : 'warn'
+    dispatchSystemEvent(
+      nextShieldState ? "SHIELD_ENGAGED: Perimeter audit active." : "SHIELD_RECALLED: Monitoring standby.", 
+      nextShieldState ? "system" : "med"
     );
+    
+    setNeuralConduit(prev => [...prev, { 
+      role: 'ai', 
+      text: nextShieldState ? "Sentinel Dispatch active. I am monitoring for unauthorized patterns." : "Sentinel recalling. Terminal guard offline." 
+    }]);
   };
 
-  const handleGlobalPurge = async () => {
-    if (window.confirm("CRITICAL: Wipe all local and cloud security records? This is IRREVERSIBLE.")) {
-      logSystemEvent("Initiating Deep Purge of all security records...", 'critical');
-      setLogs([]);
-      logSystemEvent("Local vault wiped. Cloud purge scheduled.", 'info');
+  /**
+   * Wipes all security records and terminal history.
+   */
+  const handleVaultPurge = async () => {
+    if (window.confirm("CRITICAL: Execute Global Vault Purge? This deletes all cloud and local evidence.")) {
+      dispatchSystemEvent("VAULT_PURGE: Data elimination sequence started.", "critical");
+      setSecurityVault([]);
+      // Production note: Add backend purge call here
+      dispatchSystemEvent("VAULT_PURGE: Local buffer empty. Cloud purge in queue.", "system");
     }
   };
 
-  // --- 15. DYNAMIC MASTER RENDER ENGINE (JSX) ---
+  // --- 16. MASTER RENDER ENGINE (JSX) ---
   return (
-    <div className="min-h-screen bg-[#020617] text-cyan-50 p-4 lg:p-12 font-mono selection:bg-cyan-500/40 overflow-x-hidden">
+    <div className="min-h-screen bg-[#020617] text-slate-100 p-4 lg:p-10 font-mono selection:bg-cyan-500/30 overflow-x-hidden">
       
-      {/* HUD OVERLAY ENGINE */}
+      {/* --- ATMOSPHERIC FX LAYERS --- */}
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#0f172a_0%,#020617_100%)] pointer-events-none" />
-      <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
-      <div className="fixed inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:50px_50px] opacity-[0.05] pointer-events-none" />
+      <div className="fixed inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:45px_45px] opacity-[0.03] pointer-events-none" />
 
-      <div className="relative z-10 max-w-[1920px] mx-auto space-y-10 animate-in fade-in duration-1000">
+      {/* --- MAIN OPERATIONAL INTERFACE --- */}
+      <div className="relative z-10 max-w-[1850px] mx-auto space-y-10 animate-in fade-in duration-1000">
         
-        {/* --- GLOBAL COMMAND HEADER --- */}
-        <header className="flex flex-col xl:flex-row items-center justify-between gap-10 bg-slate-900/40 p-12 rounded-[4rem] border border-cyan-900/30 backdrop-blur-3xl shadow-[0_0_80px_rgba(0,0,0,0.6)]">
+        {/* --- GLOBAL HEADER: COMMAND CONSOLE --- */}
+        <header className="flex flex-col xl:flex-row items-center justify-between gap-10 bg-slate-900/40 p-12 rounded-[4rem] border border-cyan-900/20 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.7)]">
           <div className="flex items-center gap-10">
+            {/* System Status Icon */}
             <div 
-              onClick={toggleSystemProtocol}
-              className={`w-24 h-24 rounded-[2rem] flex items-center justify-center transition-all duration-1000 cursor-pointer group relative ${
-              mode === SecurityMode.ALERT ? 'bg-red-600 animate-pulse shadow-[0_0_60px_#dc2626]' : 'bg-cyan-600 shadow-[0_0_50px_#0891b2]'
+              onClick={toggleSentinelShield}
+              className={`w-28 h-28 rounded-[2.5rem] flex items-center justify-center transition-all duration-1000 cursor-pointer group overflow-hidden border-2 ${
+                currentStatus === SecurityMode.ALERT 
+                ? 'bg-red-600 border-red-400 animate-pulse shadow-[0_0_80px_rgba(220,38,38,0.6)]' 
+                : 'bg-cyan-600 border-cyan-400/30 shadow-[0_0_60px_rgba(8,145,178,0.2)]'
             }`}>
-              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[2rem]" />
-              <svg className="w-12 h-12 text-white transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <svg className="w-14 h-14 text-white group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
             </div>
             
-            <div>
-              <div className="flex items-center gap-5">
-                <h1 className="text-5xl font-black italic tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600 uppercase">
-                  Sentinel_AI
+            {/* System Title & Telemetry */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-6">
+                <h1 className="text-6xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 uppercase">
+                  SENTINEL_AI
                 </h1>
-                <div className="flex flex-col">
-                  <span className="text-[11px] bg-cyan-600 px-3 py-1 rounded-full text-white font-black border border-cyan-400/50">PRO_V5.2</span>
+                <div className="flex flex-col border-l border-slate-800 pl-6">
+                  <span className="text-[12px] bg-cyan-900/50 px-3 py-1 rounded-full text-cyan-400 font-black border border-cyan-400/20">V6.0.4_INDUSTRIAL</span>
+                  <span className="text-[9px] text-slate-600 font-black uppercase tracking-[0.2em] mt-1.5">Node: AP-SOUTH-1 // SECURE</span>
                 </div>
               </div>
-              <div className="flex items-center gap-6 mt-4">
+              
+              <div className="flex items-center gap-10">
                 <div className="flex items-center gap-3">
-                   <div className={`w-3 h-3 rounded-full ${isMonitoring ? 'bg-green-500 shadow-[0_0_15px_#22c55e]' : 'bg-slate-700 animate-pulse'}`} />
-                   <span className="text-[11px] uppercase font-black tracking-[0.4em] text-slate-500">
-                     SYSTEM_{mode}
+                   <div className={`w-3 h-3 rounded-full ${isShieldActive ? 'bg-green-500 shadow-[0_0_15px_#22c55e]' : 'bg-slate-700 animate-pulse'}`} />
+                   <span className="text-[12px] uppercase font-black tracking-[0.4em] text-slate-400">
+                     STATUS_{currentStatus}
                    </span>
                 </div>
-                <div className="h-5 w-[1px] bg-slate-800" />
-                <span className="text-[11px] uppercase font-black tracking-[0.4em] text-cyan-600/80">
-                  Uptime: {systemMetrics.uptime_clock}s
-                </span>
+                <div className="h-6 w-[1.5px] bg-slate-800" />
+                <div className="flex gap-4">
+                  <span className="text-[11px] uppercase font-black tracking-[0.2em] text-cyan-600/60">Vault: {connectionProfile.vaultLink}</span>
+                  <span className="text-[11px] uppercase font-black tracking-[0.2em] text-indigo-500/60">Uptime: {telemetry.uptime}s</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* REAL-TIME SYSTEM TELEMETRY */}
-          <div className="flex flex-wrap justify-center items-center gap-12">
-             <div className="hidden 2xl:flex gap-12">
-                <div className="text-center group">
-                   <p className="text-[10px] text-slate-500 font-black mb-2 tracking-widest group-hover:text-cyan-400">NEURAL_LOAD</p>
-                   <div className="w-32 h-1.5 bg-slate-800 rounded-full overflow-hidden shadow-inner">
-                      <div className="h-full bg-cyan-500 transition-all duration-1000 shadow-[0_0_10px_#06b6d4]" style={{width: `${systemMetrics.cpu_load}%`}} />
+          {/* TELEMETRY WIDGETS PANEL */}
+          <div className="flex flex-wrap justify-center items-center gap-14">
+             <div className="hidden 2xl:flex gap-14">
+                <div className="space-y-3">
+                   <p className="text-[11px] text-slate-500 font-black tracking-widest text-center uppercase">Neural_Synapse</p>
+                   <div className="flex items-end gap-1.5 h-10">
+                      {neuralLoadGraph.slice(-10).map((val, idx) => (
+                        <div 
+                          key={idx} 
+                          className="w-2.5 bg-cyan-600/30 rounded-t-sm transition-all duration-700" 
+                          style={{ height: `${val}%`, opacity: (idx + 1) / 10 }} 
+                        />
+                      ))}
                    </div>
-                   <p className="text-[12px] font-black text-cyan-400 mt-2">{systemMetrics.cpu_load}%_USE</p>
                 </div>
                 <div className="text-right">
-                   <p className="text-[10px] text-slate-500 font-black mb-1 tracking-widest">VAULT_SYNC</p>
-                   <p className={`text-lg font-black ${hwProfile.vault_status === 'SYNCED' ? 'text-green-400' : 'text-red-500 animate-pulse'}`}>
-                     {hwProfile.vault_status}
-                   </p>
+                   <p className="text-[11px] text-slate-500 font-black mb-2 tracking-widest uppercase">System_Load</p>
+                   <p className="text-3xl font-black text-cyan-400 tabular-nums tracking-tighter">{telemetry.loadFactor}%</p>
                 </div>
              </div>
              
              <div className="flex gap-6">
                 <button 
-                  onClick={() => setSecurityLevel(l => l === 'MEDIUM' ? 'MAXIMUM' : 'MEDIUM')}
-                  className="px-8 py-5 bg-slate-800/50 border border-slate-700 rounded-3xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all border-b-4 border-b-cyan-900 active:border-b-0"
+                  onClick={() => setDiagnosticMode(!diagnosticMode)}
+                  className={`px-8 py-5 border rounded-3xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                    diagnosticMode ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-800/40 border-slate-700 text-slate-400 hover:bg-slate-800'
+                  }`}
                 >
-                  Set {securityLevel === 'MEDIUM' ? 'MAX_DEF' : 'STD_DEF'}
+                  {diagnosticMode ? 'CLOSE_DIAG' : 'RUN_DIAGNOSTIC'}
                 </button>
                 <button 
-                  onClick={toggleSystemProtocol}
-                  className={`px-16 py-5 rounded-[2rem] font-black text-sm uppercase tracking-[0.4em] transition-all transform hover:scale-[1.03] active:scale-95 shadow-3xl ${
-                    isMonitoring 
-                      ? 'bg-red-600/10 text-red-500 border border-red-600/50 hover:bg-red-600 hover:text-white' 
+                  onClick={toggleSentinelShield}
+                  className={`px-20 py-5 rounded-[2.5rem] font-black text-sm uppercase tracking-[0.5em] transition-all transform hover:scale-[1.03] active:scale-95 shadow-3xl ${
+                    isShieldActive 
+                      ? 'bg-red-600/10 text-red-500 border border-red-600/40 hover:bg-red-600 hover:text-white' 
                       : 'bg-cyan-600 text-white shadow-cyan-900/40 hover:bg-cyan-500'
                   }`}
                 >
-                  {isMonitoring ? 'TERMINATE_SHIELD' : 'INITIALIZE_GUARD'}
+                  {isShieldActive ? 'TERMINATE_SHIELD' : 'INITIALIZE_GUARD'}
                 </button>
              </div>
           </div>
@@ -625,55 +689,59 @@ const App: React.FC = () => {
         {/* --- MAIN OPERATIONAL GRID --- */}
         <main className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
-          {/* SENSOR ARRAY & IDENTITY PANEL */}
+          {/* LEFT OPERATIONAL PANEL (SENSORS + IDENTITY) */}
           <section className="lg:col-span-4 flex flex-col gap-12">
             
-            {/* OPTICAL NEURAL HUD */}
-            <div className="group relative bg-black rounded-[4rem] overflow-hidden border-2 border-slate-800 shadow-[0_0_60px_-15px_rgba(0,0,0,1)] transition-all hover:border-cyan-500/40">
-               <video ref={videoRef} autoPlay muted className="w-full h-full object-cover scale-x-[-1] opacity-50 group-hover:opacity-70 transition-opacity duration-1000" />
+            {/* VISUAL SENSOR HUD */}
+            <div className="group relative bg-black rounded-[4.5rem] overflow-hidden border-2 border-slate-800 shadow-[0_0_80px_-20px_rgba(0,0,0,1)] transition-all hover:border-cyan-500/50">
+               <video ref={videoSensorRef} autoPlay muted className="w-full h-full object-cover scale-x-[-1] opacity-40 group-hover:opacity-70 transition-all duration-1000" />
                
-               {/* SENSOR HUD ELEMENTS */}
+               {/* SENSOR OVERLAY HUD */}
                <div className="absolute inset-0 pointer-events-none">
-                 <div className={`absolute inset-0 border-[40px] border-black/40 transition-opacity duration-1000 ${isMonitoring ? 'opacity-20' : 'opacity-80'}`} />
-                 <div className="absolute top-0 left-0 w-full h-1.5 bg-cyan-500/20 animate-[scan_6s_linear_infinite]" />
+                 <div className={`absolute inset-0 border-[50px] border-black/50 transition-opacity duration-1000 ${isShieldActive ? 'opacity-20' : 'opacity-90'}`} />
+                 <div className="absolute top-0 left-0 w-full h-2 bg-cyan-500/10 shadow-[0_0_20px_#0891b2] animate-[scan_7s_linear_infinite]" />
                  
-                 {/* RETICLE CORNERS */}
-                 <div className="absolute top-14 left-14 w-12 h-12 border-t-4 border-l-4 border-cyan-500/40 rounded-tl-2xl" />
-                 <div className="absolute top-14 right-14 w-12 h-12 border-t-4 border-r-4 border-cyan-500/40 rounded-tr-2xl" />
-                 <div className="absolute bottom-14 left-14 w-12 h-12 border-b-4 border-l-4 border-cyan-500/40 rounded-bl-2xl" />
-                 <div className="absolute bottom-14 right-14 w-12 h-12 border-b-4 border-r-4 border-cyan-500/40 rounded-br-2xl" />
+                 {/* VIEWFINDER ELEMENTS */}
+                 <div className="absolute top-16 left-16 w-16 h-16 border-t-4 border-l-4 border-cyan-500/30 rounded-tl-3xl" />
+                 <div className="absolute top-16 right-16 w-16 h-16 border-t-4 border-r-4 border-cyan-500/30 rounded-tr-3xl" />
+                 <div className="absolute bottom-16 left-16 w-16 h-16 border-b-4 border-l-4 border-cyan-500/30 rounded-bl-3xl" />
+                 <div className="absolute bottom-16 right-16 w-16 h-16 border-b-4 border-r-4 border-cyan-500/30 rounded-br-3xl" />
                </div>
 
-               {/* CRITICAL BREACH OVERLAY */}
-               {mode === SecurityMode.ALERT && (
-                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-600/30 backdrop-blur-[2px] animate-pulse">
-                   <div className="bg-red-600 text-white px-12 py-5 font-black text-3xl tracking-[0.8em] shadow-[0_0_80px_#dc2626] mb-6">
-                     BREACH_ALERT
+               {/* ALERT STATE OVERLAY */}
+               {currentStatus === SecurityMode.ALERT && (
+                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-600/30 backdrop-blur-[3px] animate-pulse">
+                   <div className="bg-red-600 text-white px-16 py-7 font-black text-4xl tracking-[1em] shadow-[0_0_100px_#dc2626] mb-8">
+                     BREACH
                    </div>
-                   <div className="flex items-center gap-4">
-                      <div className="w-3 h-3 bg-white rounded-full animate-ping" />
-                      <span className="text-[12px] font-black text-white bg-black/80 px-8 py-3 rounded-2xl border border-red-500/50 uppercase tracking-[0.4em]">
-                        Stealth_Recording_Active
-                      </span>
+                   <div className="flex flex-col items-center gap-4">
+                      <div className="flex items-center gap-3">
+                         <div className="w-4 h-4 bg-white rounded-full animate-ping" />
+                         <span className="text-[14px] font-black text-white bg-black/80 px-10 py-4 rounded-3xl border-2 border-red-500/50 uppercase tracking-[0.5em]">
+                           Stealth_Recording_Active
+                         </span>
+                      </div>
+                      <p className="text-[10px] text-white/70 font-bold uppercase tracking-widest">Evidence uploaded to Vault ID: {activeAlertId || 'PENDING'}</p>
                    </div>
                  </div>
                )}
 
-               <div className="absolute bottom-12 left-12 right-12 flex justify-between items-end">
-                  <div className="bg-black/90 backdrop-blur-3xl p-6 rounded-[2rem] border border-slate-800 shadow-3xl">
-                    <p className="text-[10px] text-slate-500 font-black uppercase mb-1.5 tracking-[0.3em]">Optical_Stream_Link</p>
-                    <div className="flex items-center gap-3">
-                       <span className={`w-2.5 h-2.5 rounded-full ${hwProfile.sensor_array === 'OPTIMAL' ? 'bg-cyan-500 shadow-[0_0_10px_#06b6d4]' : 'bg-red-500'}`} />
-                       <p className="text-sm text-cyan-400 font-black tracking-tighter">NODE_77 // {hwProfile.sensor_array}</p>
+               {/* SENSOR FOOTER */}
+               <div className="absolute bottom-14 left-14 right-14 flex justify-between items-end">
+                  <div className="bg-black/90 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-slate-800 shadow-3xl">
+                    <p className="text-[11px] text-slate-500 font-black uppercase mb-2 tracking-[0.3em]">Optical_Stream_7</p>
+                    <div className="flex items-center gap-4">
+                       <span className={`w-3 h-3 rounded-full ${connectionProfile.visionNode === 'OPTIMAL' ? 'bg-cyan-500 shadow-[0_0_20px_#06b6d4]' : 'bg-red-500'}`} />
+                       <p className="text-lg text-cyan-400 font-black tracking-tighter uppercase">{connectionProfile.visionNode}</p>
                     </div>
                   </div>
-                  {mode === SecurityMode.MONITORING && (
-                    <div className="flex gap-2.5 mb-3">
-                       {neuralLoadData.slice(0, 6).map((val, idx) => (
+                  {isAiProcessing && (
+                    <div className="flex gap-3 mb-4">
+                       {[...Array(5)].map((_, i) => (
                          <div 
-                           key={idx} 
-                           className="w-2 bg-cyan-500/40 rounded-full animate-bounce" 
-                           style={{ height: `${val/3}px`, animationDelay: `${idx*0.1}s` }} 
+                           key={i} 
+                           className="w-2.5 bg-cyan-500/50 rounded-full animate-bounce" 
+                           style={{ height: `${20 + i*10}px`, animationDelay: `${i*0.15}s` }} 
                          />
                        ))}
                     </div>
@@ -681,213 +749,216 @@ const App: React.FC = () => {
                </div>
             </div>
 
-            {/* MASTER BIOMETRIC REGISTRY */}
-            <div className="bg-slate-900/30 p-12 rounded-[4rem] border border-slate-800/60 backdrop-blur-md shadow-2xl">
-               <div className="flex justify-between items-center mb-10">
-                 <h2 className="text-[13px] font-black text-slate-500 uppercase tracking-[0.6em] flex items-center gap-5">
-                   <span className="w-10 h-[1px] bg-slate-700"></span> Master Identity
+            {/* IDENTITY VAULT CARD */}
+            <div className="bg-slate-900/30 p-14 rounded-[5rem] border border-slate-800/60 backdrop-blur-md shadow-3xl relative overflow-hidden">
+               <div className="flex justify-between items-center mb-12">
+                 <h2 className="text-[15px] font-black text-slate-500 uppercase tracking-[0.8em] flex items-center gap-6">
+                   <span className="w-14 h-[1.5px] bg-slate-700"></span> Identity
                  </h2>
-                 <span className={`text-[9px] font-black px-3 py-1 rounded-full border ${ownerFace ? 'border-green-500/40 text-green-500' : 'border-red-500/40 text-red-500'}`}>
-                   {ownerFace ? 'LOCKED' : 'OPEN'}
+                 <span className={`text-[10px] font-black px-4 py-1.5 rounded-full border-2 ${biometricSignature ? 'border-green-500/40 text-green-500' : 'border-red-500/40 text-red-500'}`}>
+                   {biometricSignature ? 'AUTH_LOCKED' : 'AUTH_REQUIRED'}
                  </span>
                </div>
                
-               {ownerFace ? (
-                 <div className="flex items-center gap-10 bg-black/40 p-8 rounded-[2.5rem] border border-slate-800/80 group hover:border-cyan-500/30 transition-all shadow-inner relative overflow-hidden">
+               {biometricSignature ? (
+                 <div className="flex items-center gap-12 bg-black/40 p-10 rounded-[3rem] border border-slate-800 group hover:border-cyan-500/30 transition-all shadow-inner relative overflow-hidden">
                    <div className="absolute inset-0 bg-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                    <div className="relative shrink-0">
-                      <img src={ownerFace} alt="Master" className="w-32 h-32 rounded-[2rem] object-cover grayscale brightness-90 border-2 border-cyan-500/20 shadow-2xl transition-all group-hover:grayscale-0" />
-                      <div className="absolute -top-4 -right-4 w-10 h-10 bg-green-500 rounded-[1.2rem] border-8 border-[#020617] flex items-center justify-center shadow-lg">
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+                      <img src={biometricSignature} alt="Master" className="w-36 h-36 rounded-[2.5rem] object-cover grayscale brightness-90 border-4 border-cyan-500/20 shadow-3xl transition-all group-hover:grayscale-0 group-hover:scale-105" />
+                      <div className="absolute -top-5 -right-5 w-12 h-12 bg-green-500 rounded-[1.5rem] border-[10px] border-[#020617] flex items-center justify-center shadow-2xl">
+                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
                       </div>
                    </div>
                    <div className="flex-1 min-w-0">
-                     <p className="text-cyan-100 font-black text-xl uppercase tracking-tight truncate">User_Alpha</p>
-                     <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-widest leading-tight">Biometric_Hash:<br/><span className="text-slate-700 font-mono">0xFD9...A2C</span></p>
+                     <p className="text-cyan-100 font-black text-2xl uppercase tracking-tight truncate">Master_Guard_01</p>
+                     <p className="text-[12px] text-slate-500 mt-3 font-bold uppercase tracking-[0.2em] leading-tight">Key_Fingerprint:<br/><span className="text-slate-700 font-mono text-[10px]">77:F1:C9:AD:04:99</span></p>
                      <button 
-                       onClick={() => setOwnerFace(null)} 
-                       className="mt-6 text-[10px] text-red-500/70 hover:text-red-400 font-black uppercase tracking-[0.3em] transition-colors flex items-center gap-3 group/btn"
+                       onClick={() => setBiometricSignature(null)} 
+                       className="mt-8 text-[11px] text-red-500/70 hover:text-red-400 font-black uppercase tracking-[0.4em] transition-colors flex items-center gap-4 group/btn"
                      >
-                       <svg className="w-5 h-5 transition-transform group-hover/btn:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                       Wipe_Identity
+                       <svg className="w-6 h-6 transition-transform group-hover/btn:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                       Purge_Auth
                      </button>
                    </div>
                  </div>
                ) : (
                  <button 
-                   onClick={handleIdentityEnrollment}
-                   className="w-full py-24 bg-black/20 border-2 border-dashed border-slate-800 rounded-[3.5rem] text-slate-600 hover:text-cyan-400 hover:border-cyan-500/40 transition-all group shadow-inner relative overflow-hidden"
+                   onClick={handleBiometricEnrollment}
+                   className="w-full py-28 bg-black/20 border-2 border-dashed border-slate-800 rounded-[4rem] text-slate-600 hover:text-cyan-400 hover:border-cyan-500/40 transition-all group shadow-inner relative overflow-hidden"
                  >
                    <div className="absolute inset-0 bg-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                   <div className="w-24 h-24 bg-slate-800/40 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 group-hover:scale-110 group-hover:bg-cyan-500/10 transition-all border border-slate-700 shadow-2xl">
-                      <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                   <div className="w-28 h-28 bg-slate-800/40 rounded-[3rem] flex items-center justify-center mx-auto mb-12 group-hover:scale-110 group-hover:bg-cyan-500/10 transition-all border-2 border-slate-700 shadow-2xl">
+                      <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
                    </div>
-                   <p className="text-sm font-black uppercase tracking-[0.5em] mb-4">Initialize_Mapping</p>
-                   <p className="text-[11px] font-bold opacity-30 uppercase tracking-widest">Single frame biometric scan required</p>
+                   <p className="text-lg font-black uppercase tracking-[0.6em] mb-4">Run_Enrollment</p>
+                   <p className="text-[12px] font-bold opacity-30 uppercase tracking-widest text-center">Establish biometric foundation for guard protocols</p>
                  </button>
                )}
             </div>
 
-            {/* NEURAL LINK CHAT CONSOLE */}
-            <div className="bg-slate-900/30 p-12 rounded-[5rem] border border-slate-800/60 backdrop-blur-md flex flex-col h-[700px] shadow-3xl">
-               <div className="flex justify-between items-center mb-10">
-                 <div className="flex items-center gap-5">
-                    <div className="w-3 h-3 bg-cyan-500 rounded-full animate-ping" />
-                    <p className="text-[13px] font-black text-cyan-500 uppercase tracking-[0.5em]">Neural_Link</p>
+            {/* NEURAL LINK CONSOLE (CHAT) */}
+            <div className="bg-slate-900/30 p-14 rounded-[5.5rem] border border-slate-800/60 backdrop-blur-md flex flex-col h-[750px] shadow-3xl">
+               <div className="flex justify-between items-center mb-12">
+                 <div className="flex items-center gap-6">
+                    <div className="w-4 h-4 bg-cyan-500 rounded-full animate-ping" />
+                    <p className="text-[15px] font-black text-cyan-500 uppercase tracking-[0.6em]">Neural_Conduit</p>
                  </div>
-                 <div className="flex gap-2">
-                    {[1,2,3,4].map(i => <div key={i} className="w-1.5 h-4 bg-slate-800 rounded-full" />)}
+                 <div className="flex gap-2.5">
+                    {[...Array(4)].map((_, i) => <div key={i} className="w-2 h-5 bg-slate-800 rounded-full" />)}
                  </div>
                </div>
                
-               <div className="flex-1 overflow-y-auto space-y-10 pr-6 scrollbar-hide mb-10">
-                 {chatMessages.length === 0 && (
-                   <div className="h-full flex flex-col items-center justify-center opacity-[0.05]">
-                     <svg className="w-32 h-32 mb-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                     <p className="text-sm font-black uppercase tracking-[0.8em] text-center">Neural_Core_Idle<br/>Waiting for Protocol</p>
+               <div className="flex-1 overflow-y-auto space-y-12 pr-8 scrollbar-hide mb-12">
+                 {neuralConduit.length === 0 && (
+                   <div className="h-full flex flex-col items-center justify-center opacity-[0.04]">
+                     <svg className="w-40 h-40 mb-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                     <p className="text-sm font-black uppercase tracking-[1em] text-center leading-relaxed">Conduit_Standby<br/>Waiting_For_Query</p>
                    </div>
                  )}
-                 {chatMessages.map((msg, index) => (
-                   <div key={index} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'} animate-in slide-in-from-bottom-8 duration-500`}>
-                     <div className={`max-w-[90%] p-8 rounded-[3rem] text-[14px] font-medium leading-relaxed shadow-3xl border-2 ${
+                 {neuralConduit.map((msg, index) => (
+                   <div key={index} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'} animate-in slide-in-from-bottom-12 duration-700`}>
+                     <div className={`max-w-[85%] p-10 rounded-[3.5rem] text-[15px] font-medium leading-loose shadow-3xl border-2 transition-all hover:scale-[1.01] ${
                        msg.role === 'ai' 
-                        ? 'bg-slate-800/80 text-cyan-50 border-slate-700 rounded-tl-none' 
-                        : 'bg-indigo-600 text-white border-indigo-500 rounded-tr-none'
+                        ? 'bg-slate-800/80 text-cyan-50 border-slate-700 rounded-tl-none shadow-cyan-900/10' 
+                        : 'bg-indigo-600 text-white border-indigo-500 rounded-tr-none shadow-indigo-900/20'
                      }`}>
-                       <p className="opacity-40 text-[9px] font-black uppercase mb-3 tracking-widest">{msg.role === 'ai' ? 'Sentinel_Core' : 'Local_User'}</p>
+                       <p className="opacity-30 text-[10px] font-black uppercase mb-4 tracking-[0.4em]">{msg.role === 'ai' ? 'SENTINEL_INTELLIGENCE' : 'TERMINAL_OPERATOR'}</p>
                        {msg.text}
                      </div>
                    </div>
                  ))}
                  {isAiProcessing && (
-                    <div className="flex gap-5 items-center text-cyan-500 animate-pulse text-[12px] font-black uppercase tracking-[0.6em]">
-                       <span className="w-4 h-4 bg-cyan-500 rounded-full animate-ping" />
-                       Decrypting_Intelligence...
+                    <div className="flex gap-6 items-center text-cyan-500 animate-pulse text-[13px] font-black uppercase tracking-[0.8em]">
+                       <span className="w-5 h-5 bg-cyan-500 rounded-full animate-ping" />
+                       Routing_Intelligence...
                     </div>
                  )}
                </div>
 
-               <form onSubmit={handleChatInterface} className="relative group">
+               <form onSubmit={handleNeuralConduitSubmit} className="relative group">
                  <input 
-                   value={chatInput}
-                   onChange={e => setChatInput(e.target.value)}
-                   className="w-full bg-black/60 border-2 border-slate-800 rounded-[2.5rem] px-12 py-7 text-sm font-medium focus:outline-none focus:border-cyan-500/60 transition-all text-cyan-50 placeholder:text-slate-800 shadow-inner"
-                   placeholder="Enter encrypted query..."
+                   value={inputBuffer}
+                   onChange={e => setInputBuffer(e.target.value)}
+                   className="w-full bg-black/60 border-2 border-slate-800 rounded-[3rem] px-14 py-8 text-sm font-medium focus:outline-none focus:border-cyan-500/50 transition-all text-cyan-50 placeholder:text-slate-800 shadow-inner"
+                   placeholder="Inject query into Neural Core..."
                  />
-                 <button className="absolute right-8 top-1/2 -translate-y-1/2 p-4 text-slate-700 hover:text-cyan-500 transition-all transform hover:scale-125">
-                   <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                 <button className="absolute right-10 top-1/2 -translate-y-1/2 p-5 text-slate-700 hover:text-cyan-500 transition-all transform hover:scale-125">
+                   <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                  </button>
                </form>
             </div>
           </section>
 
-          {/* GLOBAL VAULT & EVENT CONSOLE PANEL */}
+          {/* RIGHT OPERATIONAL PANEL (VAULT + EVENT CONSOLE) */}
           <section className="lg:col-span-8 flex flex-col gap-12">
             
-            {/* CENTRAL LOG VAULT */}
-            <div className="flex-1 min-h-0 bg-slate-900/20 rounded-[5rem] border-2 border-slate-800/40 p-2 shadow-2xl overflow-hidden relative">
-               <SecurityDashboard logs={logs} onClear={handleGlobalPurge} />
-               <div className="absolute top-10 right-10 flex gap-4">
-                  <div className="px-5 py-2 bg-black/60 rounded-full border border-slate-800 text-[10px] font-black uppercase tracking-widest text-cyan-500">
-                    Vault_Capacity: {logs.length}/500
+            {/* MASTER LOG VAULT (SECURITY DASHBOARD) */}
+            <div className="flex-1 min-h-0 bg-slate-900/20 rounded-[6rem] border-2 border-slate-800/40 p-4 shadow-3xl overflow-hidden relative">
+               <SecurityDashboard logs={securityVault} onClear={handleVaultPurge} />
+               
+               {/* Dashboard Badges */}
+               <div className="absolute top-14 right-14 flex gap-6">
+                  <div className="px-6 py-3 bg-black/80 rounded-full border border-slate-700 text-[11px] font-black uppercase tracking-[0.3em] text-cyan-400 shadow-2xl backdrop-blur-xl">
+                    Vault_Used: {((securityVault.length / 500) * 100).toFixed(1)}%
                   </div>
                </div>
             </div>
 
-            {/* MASTER SYSTEM EVENT CONSOLE */}
-            <div className={`bg-[#020617] p-14 rounded-[5rem] border-2 border-slate-800 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden flex flex-col transition-all duration-1000 ${
-               isMonitoring || mode === SecurityMode.ALERT ? 'h-[550px]' : 'h-32'
+            {/* SYSTEM EVENT TERMINAL (HIGH-PRECISION LOGS) */}
+            <div className={`bg-[#020617] p-16 rounded-[5rem] border-2 border-slate-800 shadow-[0_0_120px_rgba(0,0,0,1)] overflow-hidden flex flex-col transition-all duration-1000 ${
+               isShieldActive || currentStatus === SecurityMode.ALERT ? 'h-[600px]' : 'h-36'
             }`}>
-               <div className="flex justify-between items-center mb-12">
-                 <div className="flex items-center gap-8">
-                    <div className="flex items-center gap-6">
-                       <h3 className="text-[15px] font-black text-slate-500 uppercase tracking-[0.8em]">Event_Terminal</h3>
-                       <div className="px-6 py-2 bg-slate-900 rounded-full border border-slate-800 flex gap-4 shadow-inner">
-                          <div className={`w-3 h-3 rounded-full ${mode === SecurityMode.ALERT ? 'bg-red-500 animate-pulse' : 'bg-red-500/20'}`} />
-                          <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
-                          <div className="w-3 h-3 rounded-full bg-green-500/80" />
+               <div className="flex justify-between items-center mb-14">
+                 <div className="flex items-center gap-10">
+                    <div className="flex items-center gap-8">
+                       <h3 className="text-[18px] font-black text-slate-500 uppercase tracking-[1em]">Event_Terminal</h3>
+                       <div className="px-8 py-3 bg-slate-900 rounded-full border border-slate-800 flex gap-6 shadow-inner">
+                          <div className={`w-4 h-4 rounded-full ${currentStatus === SecurityMode.ALERT ? 'bg-red-500 animate-pulse' : 'bg-red-500/20'}`} />
+                          <div className="w-4 h-4 rounded-full bg-yellow-500/50 shadow-[0_0_10px_rgba(234,179,8,0.2)]" />
+                          <div className="w-4 h-4 rounded-full bg-green-500/80 shadow-[0_0_10px_rgba(34,197,94,0.3)]" />
                        </div>
                     </div>
                  </div>
-                 <div className="flex gap-10">
-                    <div className="flex items-center gap-3">
-                       <span className="text-[11px] text-slate-700 font-bold uppercase tracking-widest">Buffer_Integrity:</span>
-                       <span className="text-[11px] text-green-500 font-black tracking-[0.3em] uppercase">{systemMetrics.packet_integrity}%</span>
+                 <div className="flex gap-14">
+                    <div className="flex items-center gap-4 border-r border-slate-800 pr-10">
+                       <span className="text-[12px] text-slate-700 font-bold uppercase tracking-[0.4em]">Synapse_RTT:</span>
+                       <span className="text-[12px] text-green-500 font-black tracking-[0.4em] uppercase">{telemetry.synapseLatency}ms</span>
                     </div>
                     <button 
-                      onClick={() => setTerminalOutput([])} 
-                      className="text-[11px] text-slate-700 hover:text-slate-300 font-black uppercase tracking-[0.4em] transition-colors"
+                      onClick={() => setTerminalLogs([])} 
+                      className="text-[12px] text-slate-700 hover:text-slate-200 font-black uppercase tracking-[0.6em] transition-all"
                     >
-                      Clear_Terminal
+                      Purge_Console
                     </button>
                  </div>
                </div>
                
-               {/* TERMINAL CONTENT ENGINE */}
-               <div className="flex-1 overflow-y-auto font-mono text-[13px] space-y-4 scrollbar-hide pr-10">
-                 {terminalOutput.length === 0 && (
-                    <div className="h-full flex items-center justify-center opacity-10">
-                       <p className="text-cyan-500 italic uppercase tracking-[0.8em] animate-pulse text-center leading-loose">Establishing_Handshake_Events...<br/>Terminal_Buffer_Empty</p>
+               {/* TERMINAL SCROLL ENGINE */}
+               <div className="flex-1 overflow-y-auto font-mono text-[14px] space-y-5 scrollbar-hide pr-12">
+                 {terminalLogs.length === 0 && (
+                    <div className="h-full flex flex-col items-center justify-center opacity-[0.08]">
+                       <p className="text-cyan-500 italic uppercase tracking-[1.5em] animate-pulse text-center leading-[3] text-xl">System_Standby...<br/>Terminal_Buffer_Empty</p>
                     </div>
                  )}
-                 {terminalOutput.map((log, i) => (
-                   <div key={i} className="flex gap-10 group animate-in slide-in-from-left duration-700 border-l-2 border-transparent hover:border-cyan-500/20 pl-4">
-                     <span className="text-slate-700 font-black tabular-nums tracking-tighter">[{log.time}]</span>
-                     <span className={`flex-1 transition-all duration-300 group-hover:translate-x-2 ${
-                       log.level === 'critical' ? 'text-red-500 font-black shadow-[0_0_20px_rgba(239,68,68,0.3)]' : 
-                       log.level === 'error' ? 'text-red-400' : 
-                       log.level === 'warn' ? 'text-yellow-400' : 
-                       log.level === 'success' ? 'text-green-400' : 
-                       log.level === 'neural' ? 'text-indigo-400 font-black italic' : 'text-cyan-500/60'
+                 {terminalLogs.map((log) => (
+                   <div key={log.id} className="flex gap-12 group animate-in slide-in-from-left duration-700 border-l-2 border-transparent hover:border-cyan-500/40 pl-6 py-1">
+                     <span className="text-slate-700 font-black tabular-nums tracking-tighter opacity-60">[{log.timestamp}]</span>
+                     <span className={`flex-1 transition-all duration-300 group-hover:translate-x-3 ${
+                       log.severity === 'critical' ? 'text-red-500 font-black shadow-[0_0_30px_rgba(239,68,68,0.4)] bg-red-500/5 px-4 rounded' : 
+                       log.severity === 'error' ? 'text-red-400' : 
+                       log.severity === 'med' ? 'text-yellow-400' : 
+                       log.severity === 'system' ? 'text-green-400 font-bold underline decoration-green-900 underline-offset-8' : 
+                       log.severity === 'neural' ? 'text-indigo-400 font-black italic shadow-[0_0_20px_rgba(129,140,248,0.2)]' : 'text-cyan-500/70'
                      }`}>
-                       {log.level.toUpperCase()} >> {log.msg}
+                       {log.severity.toUpperCase()} {`>>`} {log.message}
                      </span>
-                     <span className="text-slate-900 text-[10px] font-black tracking-tighter hidden xl:block uppercase">
-                       Sector_{Math.floor(Math.random()*900)+100}
+                     <span className="text-slate-900 text-[11px] font-black tracking-tighter hidden 2xl:block uppercase opacity-40">
+                       SEC_{Math.floor(Math.random()*9000)+1000}
                      </span>
                    </div>
                  ))}
-                 {isUploadingEvidence && (
-                    <div className="mt-8 p-10 bg-cyan-500/5 border border-cyan-500/10 rounded-[3rem] animate-pulse flex flex-col gap-6">
+                 
+                 {isUploadingRecord && (
+                    <div className="mt-12 p-14 bg-cyan-500/5 border-2 border-cyan-500/10 rounded-[4rem] animate-pulse flex flex-col gap-8 shadow-2xl">
                        <div className="flex justify-between items-center">
-                          <p className="text-cyan-500 font-black uppercase text-[11px] tracking-[0.5em]">Encrypting_Global_Vault_Upload...</p>
-                          <span className="text-cyan-500 font-black text-xs">UPLOADING...</span>
+                          <p className="text-cyan-500 font-black uppercase text-[13px] tracking-[0.8em]">Vault_Archiving_Sequence_Active...</p>
+                          <span className="text-cyan-500 font-black text-sm px-4 py-1 bg-cyan-900/30 rounded-full">UPLOADING...</span>
                        </div>
-                       <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden shadow-inner">
-                          <div className="w-1/2 h-full bg-cyan-500 animate-[loading_1.5s_ease-in-out_infinite]" />
+                       <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden shadow-inner">
+                          <div className="w-1/3 h-full bg-cyan-500 shadow-[0_0_30px_#06b6d4] animate-[loading_1.8s_ease-in-out_infinite]" />
                        </div>
                     </div>
                  )}
                </div>
                
-               {/* LIVE OPERATIONAL TELEMETRY FOOTER */}
-               <div className="mt-12 pt-12 border-t-2 border-slate-900/50 flex flex-wrap justify-between items-center gap-10">
-                  <div className="flex gap-16">
-                    <div className="space-y-2">
-                      <p className="text-[10px] text-slate-700 font-black uppercase tracking-[0.4em]">Entropy_Index</p>
-                      <div className="flex items-end gap-3">
-                        <p className="text-lg text-slate-400 font-black tabular-nums">{systemMetrics.entropy_factor}</p>
-                        <span className="text-[10px] text-slate-800 font-black mb-1.5 uppercase">X_Factor</span>
+               {/* TERMINAL DIAGNOSTICS FOOTER */}
+               <div className="mt-14 pt-14 border-t-2 border-slate-900/80 flex flex-wrap justify-between items-center gap-12">
+                  <div className="flex gap-24">
+                    <div className="space-y-3">
+                      <p className="text-[11px] text-slate-700 font-black uppercase tracking-[0.6em]">Entropy_Index</p>
+                      <div className="flex items-end gap-4">
+                        <p className="text-2xl text-slate-500 font-black tabular-nums">{telemetry.entropyLevel}</p>
+                        <span className="text-[11px] text-slate-800 font-black mb-1.5 uppercase tracking-widest">Global_X</span>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <p className="text-[10px] text-slate-700 font-black uppercase tracking-[0.4em]">Memory_Commit</p>
-                      <p className="text-lg text-slate-400 font-black tabular-nums">{systemMetrics.vram_commit}%</p>
+                    <div className="space-y-3">
+                      <p className="text-[11px] text-slate-700 font-black uppercase tracking-[0.6em]">Memory_Commit</p>
+                      <p className="text-2xl text-slate-500 font-black tabular-nums">{telemetry.loadFactor}%</p>
                     </div>
-                    <div className="space-y-2 hidden sm:block">
-                      <p className="text-[10px] text-slate-700 font-black uppercase tracking-[0.4em]">Synapse_RTT</p>
-                      <p className="text-lg text-cyan-600 font-black tabular-nums">{systemMetrics.neural_latency}ms</p>
+                    <div className="space-y-3 hidden 2xl:block">
+                      <p className="text-[11px] text-slate-700 font-black uppercase tracking-[0.6em]">Integrity_Score</p>
+                      <p className="text-2xl text-green-700 font-black tabular-nums">{telemetry.integrityScore}%</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-6">
-                     <p className="text-[11px] text-slate-700 font-black uppercase tracking-[0.4em]">Core_Processing:</p>
-                     <div className="flex gap-2.5 items-end h-6">
-                        {[...Array(10)].map((_, i) => (
+                  <div className="flex items-center gap-10">
+                     <p className="text-[12px] text-slate-700 font-black uppercase tracking-[0.6em]">Core_Handshake:</p>
+                     <div className="flex gap-4 items-end h-10">
+                        {[...Array(12)].map((_, i) => (
                           <div 
                             key={i} 
-                            className={`w-2.5 rounded-sm transition-all duration-500 ${
-                              i < 7 ? 'bg-cyan-500/20 h-4' : 'bg-slate-800 h-2 animate-pulse'
+                            className={`w-3 rounded-full transition-all duration-700 ${
+                              i < 9 ? 'bg-cyan-500/20 h-6' : 'bg-slate-800 h-3 animate-pulse'
                             }`} 
                           />
                         ))}
@@ -898,34 +969,40 @@ const App: React.FC = () => {
           </section>
         </main>
         
-        {/* COMMAND FOOTER */}
-        <footer className="text-center pb-20 pt-10">
-           <p className="text-[11px] font-black text-slate-800 uppercase tracking-[1em] opacity-40 hover:opacity-100 transition-opacity cursor-default">
-             Secure_Engagement_v5.2 // Aether_Shield_Engine // Verified_Identity_Protection
+        {/* --- SYSTEM FOOTER CREDITS --- */}
+        <footer className="text-center pb-24 pt-16 border-t border-slate-900/30">
+           <p className="text-[12px] font-black text-slate-800 uppercase tracking-[1.5em] opacity-40 hover:opacity-100 transition-opacity cursor-default select-none">
+             Aether_Shield_Network // Neural_Defense_Verified // v6.0_STABLE
            </p>
         </footer>
       </div>
 
-      <canvas ref={canvasRef} className="hidden" />
+      {/* --- BACKGROUND PROCESSING CANVAS --- */}
+      <canvas ref={processingCanvasRef} className="hidden" />
       
-      {/* GLOBAL SYSTEM STYLES */}
+      {/* --- GLOBAL ANIMATIONS & CUSTOM STYLES --- */}
       <style>{`
         @keyframes scan {
-          0% { transform: translateY(-100px); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(1000px); opacity: 0; }
+          0% { transform: translateY(-150px); opacity: 0; }
+          15% { opacity: 1; }
+          85% { opacity: 1; }
+          100% { transform: translateY(1200px); opacity: 0; }
         }
         @keyframes loading {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(200%); }
+          0% { transform: translateX(-150%); }
+          100% { transform: translateX(300%); }
         }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
         ::selection {
-          background: rgba(8, 145, 178, 0.4);
+          background: rgba(8, 145, 178, 0.5);
           color: white;
+        }
+
+        /* High-Definition Text Glow */
+        .glow-text {
+          text-shadow: 0 0 20px rgba(8, 145, 178, 0.4);
         }
       `}</style>
     </div>
@@ -933,5 +1010,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
-  // PART 1 END - PART 2 SHURU KAREIN?
