@@ -42,7 +42,7 @@ const callWithRetry = async (fn: (model: any) => Promise<any>, retries = 3) => {
       const apiKey = getRandomKey();
       const genAI = new GoogleGenAI(apiKey);
       // Prototype ke liye 'gemini-1.5-flash' sabse fast aur reliable hai
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
       
       return await fn(model);
     } catch (error: any) {
