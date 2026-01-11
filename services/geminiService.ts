@@ -7,26 +7,27 @@ import { GoogleGenAI } from "@google/genai";
 const getAllKeys = (): string[] => {
   const keys: string[] = [];
   
-  // Vercel/Vite se keys ka pool nikalna
-  const pool = process.env.GEMINI_KEYS_POOL;
+  // Vite standard access aur process.env (Vercel) dono ko check karna
+  // Isse key rotation feature aur bhi robust ho jata hai
+  const pool = (import.meta.env?.VITE_GEMINI_KEYS_POOL) || (process.env?.GEMINI_KEYS_POOL);
   if (pool) {
-    // Comma-separated string ko array mein badalna
-    keys.push(...pool.split(',').map(k => k.trim()));
+    keys.push(...pool.split(',').map((k: string) => k.trim()));
   }
 
-  // Fallback: Agar koi single key set ho
-  if (process.env.GEMINI_API_KEY) {
-    keys.push(process.env.GEMINI_API_KEY);
+  // Fallback: Single key setup
+  const singleKey = (import.meta.env?.VITE_GEMINI_API_KEY) || (process.env?.GEMINI_API_KEY);
+  if (singleKey) {
+    keys.push(singleKey);
   }
 
-  // Duplicate keys hatana aur khali strings saaf karna
+  // Duplicates hatana aur valid keys filter karna
   return Array.from(new Set(keys)).filter(k => !!k);
 };
 
 const keysPool = getAllKeys();
 
 const getRandomKey = (): string => {
-  if (keysPool.length === 0) return "MISSING_KEY";
+  if (keysPool.length === 0) return "";
   return keysPool[Math.floor(Math.random() * keysPool.length)];
 };
 
@@ -40,19 +41,24 @@ const callWithRetry = async (fn: (model: any) => Promise<any>, retries = 3) => {
   for (let i = 0; i < retries; i++) {
     try {
       const apiKey = getRandomKey();
-      const genAI = new GoogleGenAI(apiKey);
-      // Prototype ke liye 'gemini-1.5-flash' sabse fast aur reliable hai
+      if (!apiKey) throw new Error("SENTINEL_ERROR: No Gemini API Key found in pool.");
+
+      // Corrected class name to GoogleGenerativeAI
+      const genAI = new GoogleGenerativeAI(apiKey);
+      
+      // Model name kept as requested: gemini-2.5-flash-lite
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
       
       return await fn(model);
     } catch (error: any) {
       lastError = error;
-      // Agar Rate Limit (429) ya Server Error (503) aaye, toh retry karein
-      if (error.status === 429 || error.status === 503 || error.message?.includes('429')) {
-        console.warn(`Key failed or rate limited. Retrying with another key... (${i + 1}/${retries})`);
+      
+      // Rate Limit (429) ya Overloaded (503) par key switch karke retry karna
+      if (error.status === 429 || error.message?.includes('429') || error.status === 503) {
+        console.warn(`Sentinel Link unstable. Rotating keys... Attempt ${i + 1}/${retries}`);
         continue;
       }
-      throw error; // Baaki errors (e.g. Invalid Key) par turant stop karein
+      throw error; 
     }
   }
   throw lastError;
@@ -63,7 +69,7 @@ const callWithRetry = async (fn: (model: any) => Promise<any>, retries = 3) => {
 // ==========================================
 
 /**
- * Intruder ki photo analyze karta hai
+ * Intruder ki photo analyze karta hai (Vision Analysis)
  */
 export const analyzeIntrusion = async (imageB64: string) => {
   return await callWithRetry(async (model) => {
@@ -81,11 +87,11 @@ export const analyzeIntrusion = async (imageB64: string) => {
 };
 
 /**
- * Security Assistant ke saath chat setup karta hai
+ * Security Assistant ke saath chat protocol
  */
 export const securityChat = async (history: { role: string; text: string }[], message: string) => {
   return await callWithRetry(async (model) => {
-    // Model ko security assistant ki tarah behave karne ke liye instruct karna
+    // History mapping for Gemini standard roles
     const chat = model.startChat({
       history: history.map(h => ({
         role: h.role === 'ai' ? 'model' : 'user',
